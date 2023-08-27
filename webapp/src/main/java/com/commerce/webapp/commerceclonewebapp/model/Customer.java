@@ -5,9 +5,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import flexjson.JSON;
 import flexjson.JSONDeserializer;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -17,7 +22,7 @@ import java.util.List;
 @Table(name = "customer" , uniqueConstraints = {
 		@UniqueConstraint(columnNames = "email")
 })
-public class Customer {
+public class Customer implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +44,16 @@ public class Customer {
 
 	@Column(name = "country_code")
 	private String countryCode;
+
+	@Column(name = "is_Account_NonExpired")
+	private boolean isAccountNonExpired;
+	@Column(name = "is_Account_NonLocked")
+	private boolean isAccountNonLocked;
+	@Column(name = "is_Credentials_NonExpired")
+	private boolean isCredentialsNonExpired;
+	@Column(name = "is_Enabled")
+	private boolean isEnabled;
+
 
 	public Long getCustomerId() {
 		return customerId;
@@ -72,8 +87,39 @@ public class Customer {
 		this.email = email;
 	}
 
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		List<GrantedAuthority>authorityList = List.of( new SimpleGrantedAuthority("ROLE_User"));
+		return authorityList;
+	}
+
 	public String getPassword() {
 		return password;
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 	public void setPassword(String password) {
@@ -95,6 +141,22 @@ public class Customer {
 
 	public void setCountryCode(String countryCode) {
 		this.countryCode = countryCode;
+	}
+
+	public void setAccountNonExpired(boolean accountNonExpired) {
+		isAccountNonExpired = accountNonExpired;
+	}
+
+	public void setAccountNonLocked(boolean accountNonLocked) {
+		isAccountNonLocked = accountNonLocked;
+	}
+
+	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+		isCredentialsNonExpired = credentialsNonExpired;
+	}
+
+	public void setEnabled(boolean enabled) {
+		isEnabled = enabled;
 	}
 
 	public static Customer fromJsonToCustomer(String json){

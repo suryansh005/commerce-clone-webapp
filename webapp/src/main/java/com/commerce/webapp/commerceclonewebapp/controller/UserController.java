@@ -2,9 +2,8 @@ package com.commerce.webapp.commerceclonewebapp.controller;
 
 
 import com.commerce.webapp.commerceclonewebapp.model.Customer;
-import com.commerce.webapp.commerceclonewebapp.service.CustomerService;
-import org.apache.catalina.User;
-import org.apache.logging.log4j.util.Strings;
+import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
+import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +23,16 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtService jwtService;
+
     @RequestMapping(value = "/register" , method = RequestMethod.POST)
     public ResponseEntity<String> registerUser(@RequestBody String customerJson){
 
-     //1. convert  json to object.
         Customer uiCustomer = Customer.fromJsonToCustomer(customerJson);
-     //2. get email
+
         String email = uiCustomer.getEmail();
-     //3. null and empty checks
+
         if(email==null || email.trim().isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid email");
         }else {
@@ -43,6 +44,10 @@ public class UserController {
                     .firstName(uiCustomer.getFirstName())
                     .lastName(uiCustomer.getLastName())
                     .password(passwordEncoder.encode(uiCustomer.getPassword()))
+                    .isAccountNonExpired(true)
+                    .isCredentialsNonExpired(true)
+                    .isEnabled(true)
+                    .isAccountNonLocked(true)
                     .contactNumber(uiCustomer.getContactNumber())
                     .countryCode(uiCustomer.getCountryCode())
                     .build();
@@ -50,6 +55,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body("user created");
         }
 
+    }
+    @RequestMapping(value = "/test")
+    public ResponseEntity test(){
 
+        return ResponseEntity.ok("hello");
     }
 }
