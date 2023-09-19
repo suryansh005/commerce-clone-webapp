@@ -1,7 +1,5 @@
 package com.commerce.webapp.commerceclonewebapp.model;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import flexjson.JSON;
 import flexjson.JSONDeserializer;
 import lombok.*;
@@ -10,8 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import java.util.Arrays;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -26,6 +23,7 @@ public class Customer implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "customer_id")
 	private Long customerId;
 
 	@Column(name = "first_name")

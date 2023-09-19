@@ -2,15 +2,12 @@ package com.commerce.webapp.commerceclonewebapp.config;
 
 
 import com.commerce.webapp.commerceclonewebapp.repository.CustomerRepository;
-import com.commerce.webapp.commerceclonewebapp.security.JwtUsernamePasswordAuthFilter;
-import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,7 +37,7 @@ public class AppConfig {
         };
     }
 
-    //3
+
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -49,10 +46,15 @@ public class AppConfig {
         return provider;
     }
 
-    //2.
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
     }
 
 

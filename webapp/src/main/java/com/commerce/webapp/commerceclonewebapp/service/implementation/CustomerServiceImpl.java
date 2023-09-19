@@ -1,4 +1,4 @@
-package com.commerce.webapp.commerceclonewebapp.service;
+package com.commerce.webapp.commerceclonewebapp.service.implementation;
 
 import com.commerce.webapp.commerceclonewebapp.model.Customer;
 import com.commerce.webapp.commerceclonewebapp.repository.CustomerRepository;
