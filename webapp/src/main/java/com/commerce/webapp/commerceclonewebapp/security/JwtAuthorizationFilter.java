@@ -5,6 +5,8 @@ import com.commerce.webapp.commerceclonewebapp.model.params.ReturnStatusParam;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
 
+import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;
+import com.commerce.webapp.commerceclonewebapp.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,7 +26,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import  java.util.List;
 
+import static com.commerce.webapp.commerceclonewebapp.util.Constants.ACCESS_TOKEN;
+import static com.commerce.webapp.commerceclonewebapp.util.Constants.BLANK;
 
 
 @Service
@@ -40,35 +47,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     private  ObjectMapper mapper ;
 
+ private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token");
+
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return skipFilterUrls.stream().anyMatch( url -> new AntPathRequestMatcher(url).matches(request));
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        /* request header method
-        String authHeader = request.getHeader(AUTHORIZATION_STR);
-        if(authHeader == null || !authHeader.startsWith(BEARER_STR)){
-            filterChain.doFilter(request,response);
-            return;
-        }
+            Cookie jwtCookie = CookieUtil.getCookieByName(request,ACCESS_TOKEN);
+            String jwtToken = jwtCookie == null ? BLANK : jwtCookie.getValue();
 
-        String jwtToken = authHeader.substring(7);
-
-        */
-        if(request.getServletPath().equals("/login") || request.getServletPath().equals("/auth")){
-            filterChain.doFilter(request,response);
-        }
-        else {
-
-            Cookie[] cookies = request.getCookies();
-            String jwtToken = "";
-            if(cookies!=null){
-                for (Cookie cookie : cookies){
-                    if(cookie.getName().equals("accessToken")){
-                        jwtToken = cookie.getValue();
-                        break;
-                    }
-                }
-            }
             if(jwtToken.isEmpty()){
                 filterChain.doFilter(request,response);
                 return;
@@ -87,19 +80,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 }
                 filterChain.doFilter(request,response);
             }catch (Exception e){
-
-                ReturnStatusParam.ReturnStatusParamBuilder builder =  ReturnStatusParam.builder().statusCode(HttpStatus.UNAUTHORIZED.value()).success(false);
+                logger.error("Error occured During Jwt authorization " ,e );
+                ReturnStatusParam ret = null;
                 if(e instanceof ExpiredJwtException)
-                    builder.message("Access Token Expired");
+                    ret = JsonUtil.tokenErrResponse("Expired_Token_JWT");
                 else
-                    builder.message("Invalid Token");
+                    ret = JsonUtil.tokenErrResponse("Invalid_Token_JWT");
 
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                mapper.writeValue(response.getWriter(), builder.build());
+                mapper.writeValue(response.getWriter(), ret);
 
             }
-        }
 
     }
 }

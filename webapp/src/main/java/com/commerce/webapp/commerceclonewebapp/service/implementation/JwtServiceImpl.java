@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
 
+import static com.commerce.webapp.commerceclonewebapp.util.Constants.AUTHORITIES_STR;
+
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -61,7 +63,7 @@ public class JwtServiceImpl implements JwtService {
 
         return Jwts.builder()
                 .setSubject(customer.getUsername())
-                .claim("authorities",customer.getAuthorities())
+                .claim(AUTHORITIES_STR,customer.getAuthorities())
                 .setIssuedAt(new Date())
                 .signWith(getSigninKey(), SignatureAlgorithm.HS512)
                 .setExpiration(new Date(Instant.now().plusSeconds(86400).toEpochMilli()))

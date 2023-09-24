@@ -17,7 +17,7 @@ public class RefreshToken {
 
     @OneToOne
     @JoinColumn(name = "customer_id" ,  referencedColumnName = "customer_id")
-    private Customer customer;
+    private Customer user;
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,11 +40,11 @@ public class RefreshToken {
     }
 
     public Customer getCustomer() {
-        return customer;
+        return user;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomer(Customer user) {
+        this.user = user;
     }
 
     public Date getExpiryDate() {

@@ -11,6 +11,7 @@ public class JsonUtil {
         headers.add("Content-Type", "application/json; charset=utf-8");
         ReturnStatusParam returnStatusParam = ReturnStatusParam.builder()
                 .success(true)
+                .message("Please login")
                 .statusCode(HttpStatus.OK.value())
                 .build();
         String returnStatusParamStr = returnStatusParam.toJson();
@@ -47,7 +48,7 @@ public class JsonUtil {
         headers.add("Content-Type", "application/json; charset=utf-8");
         ReturnStatusParam returnStatusParam = ReturnStatusParam.builder()
                 .success(false)
-                .message("Authenticate again")
+                .message("Re-Auth")
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .build();
         String returnStatusParamStr = returnStatusParam.toJson();
@@ -67,6 +68,18 @@ public class JsonUtil {
         String returnStatusParamStr = returnStatusParam.toJson();
 
         return new ResponseEntity<String>(returnStatusParamStr,headers,HttpStatus.OK);
+
+    }
+    public static ReturnStatusParam tokenErrResponse(String message) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json; charset=utf-8");
+        ReturnStatusParam returnStatusParam = ReturnStatusParam.builder()
+                .success(false)
+                .message(message)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
+                .build();
+
+    return returnStatusParam;
 
     }
 }

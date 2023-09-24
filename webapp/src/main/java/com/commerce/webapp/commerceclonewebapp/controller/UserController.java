@@ -9,10 +9,8 @@ import com.commerce.webapp.commerceclonewebapp.service.interfaces.RefreshTokServ
 import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;
 import com.commerce.webapp.commerceclonewebapp.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
+
+
+import static com.commerce.webapp.commerceclonewebapp.util.Constants.REFRESH_TOKEN;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -38,7 +38,7 @@ public class UserController {
     @Autowired
     private RefreshTokService refreshTokService;
 
-    @RequestMapping(value = "/register" , method = RequestMethod.POST)
+    @RequestMapping(value = "/register" , method = RequestMethod.POST , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<String> registerUser(@RequestBody String customerJson){
 
@@ -52,6 +52,7 @@ public class UserController {
             Customer dbCustomer = customerService.findByEmail(email);
             if(dbCustomer!=null)
                 return ResponseEntity.ok("user already exists");
+
             Customer customer = Customer.builder()
                     .email(uiCustomer.getEmail())
                     .firstName(uiCustomer.getFirstName())
@@ -75,17 +76,23 @@ public class UserController {
     }
 
     @RequestMapping(value = "/refresh-token")
+    @ResponseBody
     public ResponseEntity<String> refreshToken(HttpServletRequest request, HttpServletResponse response){
-        Cookie refreshCookie = CookieUtil.getCookieByName(request,"refreshToken");
+        Cookie refreshCookie = CookieUtil.getCookieByName(request,REFRESH_TOKEN);
 
         if(refreshCookie != null){
             String refreshTokenStr =  refreshCookie.getValue();
             try {
-                RefreshToken refreshTokenDb = refreshTokService.findByToken(refreshTokenStr).orElseThrow(()->new RuntimeException("Token not in Db") );
-                //verify
-                refreshTokService.verifyToken(refreshTokenDb);
+
+                String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+                Customer user =  customerService.findByEmail(userEmail);
+
+//                RefreshToken refreshTokenDb = refreshTokService.findByToken(refreshTokenStr).orElseThrow(()->
+//                        new RuntimeException(String.format("Token %s not found in DB",refreshTokenStr)));
+//                //verify
+//                refreshTokService.verifyToken(refreshTokenDb);
                 //get user
-                Customer user =  refreshTokenDb.getCustomer();
+//                Customer user =  refreshTokenDb.getCustomer();
                 //generate jwt
                 String newJwtToken =  jwtService.generateToken(user);
                 response.addCookie(CookieUtil.generateJwtCookie(newJwtToken));
@@ -93,13 +100,13 @@ public class UserController {
                 return JsonUtil.genericSuccess();
 
             }catch (Exception e){
-                CookieUtil.deleteCookie(response,request,"refreshToken");
+                CookieUtil.deleteCookie(response,request,REFRESH_TOKEN);
                 System.out.println(e.getMessage());
                 return JsonUtil.genericUnauthorized();
             }
 
         }
-        System.out.println("refreshToken  cookie absent");
+        System.out.println("refreshToken cookie absent");
         return JsonUtil.genericUnauthorized();
     }
 

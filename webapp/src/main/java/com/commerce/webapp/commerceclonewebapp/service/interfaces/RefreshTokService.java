@@ -9,4 +9,5 @@ public interface RefreshTokService {
     Optional<RefreshToken> findByToken(String token);
     RefreshToken createRefreshToken(Authentication authResult);
      RefreshToken verifyToken(RefreshToken token);
+     Long deleteByUserId(Long userId);
 }

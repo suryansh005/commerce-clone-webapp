@@ -48,6 +48,9 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     @Autowired
     private RefreshTokService refreshTokService;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
 
     @Autowired
     public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
@@ -88,6 +91,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
             if(authResult.isAuthenticated() && !authResult.getName().isEmpty()){
 
                 String jwtToken =  jwtService.generateToken(authResult);
+
                 RefreshToken refreshToken = refreshTokService.createRefreshToken(authResult);
 
                 response.addCookie(CookieUtil.generateJwtCookie(jwtToken));
@@ -96,7 +100,6 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
                 builder.message("Authenticated").statusCode(response.getStatus());
 
-//            response.sendRedirect("/webapp/user/test");
             }else{
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 builder.message("Authentication Error").success(false).statusCode(response.getStatus());

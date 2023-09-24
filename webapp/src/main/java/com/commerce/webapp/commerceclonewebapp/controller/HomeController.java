@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 
 @Controller
 
@@ -29,8 +29,8 @@ public class HomeController {
     private CustomerService customerService;
 
     @RequestMapping(value = "/login",method = RequestMethod.GET)
-    public ResponseEntity<String> login(HttpServletRequest request){
-
+    public String login(HttpServletRequest request){
+        System.out.println("inside login page");
         try {
             Cookie [] cookies = request.getCookies();
 
@@ -50,16 +50,17 @@ public class HomeController {
                         throw new RuntimeException();
                     }
 
-//                return "redirect:/user/test";
-                    return JsonUtil.genericLoginRedirect();
+                return "redirect:/user/test";
+//                    return JsonUtil.genericLoginRedirect();
                 }
             }
         }catch (Exception e){
             System.out.println("Error " +  e.getMessage());
-            return JsonUtil.genericLoginError();
+//            return JsonUtil.genericLoginError();
+            return "login";
 
         }
-//        return "login";
-        return JsonUtil.genericLoginSuccess();
+        return "login";
+//        return JsonUtil.genericLoginSuccess();
     }
 }
