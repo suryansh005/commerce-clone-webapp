@@ -19,7 +19,7 @@ import java.util.List;
 @Table(name = "customer" , uniqueConstraints = {
 		@UniqueConstraint(columnNames = "email")
 })
-public class Customer implements UserDetails {
+public class Customer  {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,14 +43,14 @@ public class Customer implements UserDetails {
 	@Column(name = "country_code")
 	private String countryCode;
 
-	@Column(name = "is_Account_NonExpired")
-	private boolean isAccountNonExpired;
-	@Column(name = "is_Account_NonLocked")
-	private boolean isAccountNonLocked;
-	@Column(name = "is_Credentials_NonExpired")
-	private boolean isCredentialsNonExpired;
-	@Column(name = "is_Enabled")
-	private boolean isEnabled;
+	@Column(name = "is_Account_Expired")
+	private boolean isAccountExpired;
+	@Column(name = "is_Account_Locked")
+	private boolean isAccountLocked;
+	@Column(name = "is_Credentials_Expired")
+	private boolean isCredentialsExpired;
+	@Column(name = "is_Active")
+	private boolean isActive;
 
 
 	public Long getCustomerId() {
@@ -85,7 +85,7 @@ public class Customer implements UserDetails {
 		this.email = email;
 	}
 
-	@Override
+
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority>authorityList = List.of( new SimpleGrantedAuthority("ROLE_User"));
 		return authorityList;
@@ -95,29 +95,9 @@ public class Customer implements UserDetails {
 		return password;
 	}
 
-	@Override
+
 	public String getUsername() {
 		return email;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
 	}
 
 	public void setPassword(String password) {
@@ -141,20 +121,36 @@ public class Customer implements UserDetails {
 		this.countryCode = countryCode;
 	}
 
-	public void setAccountNonExpired(boolean accountNonExpired) {
-		isAccountNonExpired = accountNonExpired;
+	public boolean isAccountExpired() {
+		return isAccountExpired;
 	}
 
-	public void setAccountNonLocked(boolean accountNonLocked) {
-		isAccountNonLocked = accountNonLocked;
+	public void setAccountExpired(boolean accountExpired) {
+		isAccountExpired = accountExpired;
 	}
 
-	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-		isCredentialsNonExpired = credentialsNonExpired;
+	public boolean isAccountLocked() {
+		return isAccountLocked;
 	}
 
-	public void setEnabled(boolean enabled) {
-		isEnabled = enabled;
+	public void setAccountLocked(boolean accountLocked) {
+		isAccountLocked = accountLocked;
+	}
+
+	public boolean isCredentialsExpired() {
+		return isCredentialsExpired;
+	}
+
+	public void setCredentialsExpired(boolean credentialsExpired) {
+		isCredentialsExpired = credentialsExpired;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean active) {
+		isActive = active;
 	}
 
 	public static Customer fromJsonToCustomer(String json){

@@ -1,10 +1,11 @@
-package com.commerce.webapp.commerceclonewebapp.security;
+package com.commerce.webapp.commerceclonewebapp.security.filters;
 
 import com.commerce.webapp.commerceclonewebapp.model.DummyAuthentication;
 import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
 import com.commerce.webapp.commerceclonewebapp.model.params.ReturnStatusParam;
 import com.commerce.webapp.commerceclonewebapp.repository.CustomerRepository;
 import com.commerce.webapp.commerceclonewebapp.repository.RefreshTokenRepository;
+import com.commerce.webapp.commerceclonewebapp.security.JwtAuthRequest;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.RefreshTokService;
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -52,9 +54,12 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     private CustomerRepository customerRepository;
 
 
+
+
     @Autowired
-    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
+    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService , CustomAuthenticationFailureHandler failureHandler) {
         super.setAuthenticationManager(authenticationManager);
+        super.setAuthenticationFailureHandler(failureHandler);
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
@@ -64,7 +69,8 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-           try{
+        Authentication authentication = null;
+
 //               JwtAuthRequest jwtAuthRequest = new ObjectMapper().convertValue(request.getParameterMap(),JwtAuthRequest.class);
                JwtAuthRequest jwtAuthRequest = JwtAuthRequest.builder().
                                                 username(request.getParameter("username"))
@@ -74,44 +80,67 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
                        jwtAuthRequest.getUsername(),
                        jwtAuthRequest.getPassword()
                );
-               return authenticationManager.authenticate(authObject);
-           }catch (Exception e){
-                logger.error(e.getMessage());
-                return dummy;
-           }
+                authentication = super.attemptAuthentication(request,response);
+
+               return authentication;
+
+
     }
+
+//    @Override
+//    protected void successfulAuthentication(HttpServletRequest request,
+//                                            HttpServletResponse response, FilterChain chain,
+//                                            Authentication authResult)
+//            throws IOException, ServletException {
+//        ReturnStatusParam.ReturnStatusParamBuilder builder =  ReturnStatusParam.builder().statusCode(HttpStatus.UNAUTHORIZED.value()).success(true);
+//        try {
+//            if(!authResult.isAuthenticated() || authResult.getName().isEmpty())
+//                throw new UsernameNotFoundException("Unable to find user");
+//
+//
+//            String jwtToken =  jwtService.generateToken(authResult);
+//
+//            RefreshToken refreshToken = refreshTokService.createRefreshToken(authResult);
+//
+//            response.addCookie(CookieUtil.generateJwtCookie(jwtToken));
+//            response.addCookie(CookieUtil.generateRefreshCookie(refreshToken.getToken()));
+//            response.addCookie(CookieUtil.setRandom("testvalue"));
+//            response.setStatus(HttpStatus.OK.value());
+//
+//            builder.message("Authenticated").statusCode(response.getStatus());
+//
+//        }catch (Exception e){
+//            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+//            builder.message("Authentication Error").success(false).statusCode(response.getStatus());
+//        }
+//        response.setContentType("application/json; charset=utf-8");
+//        mapper.writeValue(response.getWriter(), builder.build());
+//    }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response, FilterChain chain,
                                             Authentication authResult)
             throws IOException, ServletException {
-        ReturnStatusParam.ReturnStatusParamBuilder builder =  ReturnStatusParam.builder().statusCode(HttpStatus.UNAUTHORIZED.value()).success(true);
-        try {
-            if(authResult.isAuthenticated() && !authResult.getName().isEmpty()){
+        ReturnStatusParam.ReturnStatusParamBuilder builder =  ReturnStatusParam.builder().statusCode(HttpStatus.OK.value()).success(true);
 
-                String jwtToken =  jwtService.generateToken(authResult);
 
-                RefreshToken refreshToken = refreshTokService.createRefreshToken(authResult);
+            String jwtToken =  jwtService.generateToken(authResult);
 
-                response.addCookie(CookieUtil.generateJwtCookie(jwtToken));
-                response.addCookie(CookieUtil.generateRefreshCookie(refreshToken.getToken()));
-                response.setStatus(HttpStatus.OK.value());
+            RefreshToken refreshToken = refreshTokService.createRefreshToken(authResult);
 
-                builder.message("Authenticated").statusCode(response.getStatus());
+            response.addCookie(CookieUtil.generateJwtCookie(jwtToken));
+            response.addCookie(CookieUtil.generateRefreshCookie(refreshToken.getToken()));
+            response.setStatus(HttpStatus.OK.value());
 
-            }else{
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                builder.message("Authentication Error").success(false).statusCode(response.getStatus());
-            }
+            builder.message("Authenticated").statusCode(response.getStatus());
 
-        }catch (Exception e){
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            builder.message("Authentication Error").success(false).statusCode(response.getStatus());
-        }
+
         response.setContentType("application/json; charset=utf-8");
         mapper.writeValue(response.getWriter(), builder.build());
     }
+
+
 
 
 }

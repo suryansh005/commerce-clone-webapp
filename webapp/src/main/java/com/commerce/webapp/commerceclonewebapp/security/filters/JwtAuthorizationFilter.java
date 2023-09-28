@@ -1,4 +1,4 @@
-package com.commerce.webapp.commerceclonewebapp.security;
+package com.commerce.webapp.commerceclonewebapp.security.filters;
 
 import com.commerce.webapp.commerceclonewebapp.model.Customer;
 import com.commerce.webapp.commerceclonewebapp.model.params.ReturnStatusParam;
@@ -9,10 +9,11 @@ import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;
 import com.commerce.webapp.commerceclonewebapp.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
+
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -47,7 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     private  ObjectMapper mapper ;
 
- private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token");
+    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token");
 
 
     @Override
@@ -63,8 +64,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String jwtToken = jwtCookie == null ? BLANK : jwtCookie.getValue();
 
             if(jwtToken.isEmpty()){
-                filterChain.doFilter(request,response);
-                return;
+                /* throw 401 in this case also  as all apis need jwt verfication
+                    is some  does not add them in skip urls
+                */
+//                filterChain.doFilter(request,response);
+                throw new BadCredentialsException("Empty jwt token");
+//                return;
             }
             try {
                 String customerEmail = jwtService.extractEmail(jwtToken);
@@ -79,7 +84,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     }
                 }
                 filterChain.doFilter(request,response);
-            }catch (Exception e){
+            }catch (JwtException e){
                 logger.error("Error occured During Jwt authorization " ,e );
                 ReturnStatusParam ret = null;
                 if(e instanceof ExpiredJwtException)

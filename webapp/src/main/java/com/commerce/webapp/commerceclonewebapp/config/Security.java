@@ -1,7 +1,8 @@
 package com.commerce.webapp.commerceclonewebapp.config;
 
 
-import com.commerce.webapp.commerceclonewebapp.security.CustomUsernamePasswordAuthenticationFilter;
+import com.commerce.webapp.commerceclonewebapp.security.filters.CustomAuthenticationFailureHandler;
+import com.commerce.webapp.commerceclonewebapp.security.filters.CustomUsernamePasswordAuthenticationFilter;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +15,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;;
-import com.commerce.webapp.commerceclonewebapp.security.JwtAuthorizationFilter;
+import com.commerce.webapp.commerceclonewebapp.security.filters.JwtAuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.commerce.webapp.commerceclonewebapp.security.RefreshTokFilter;
+import com.commerce.webapp.commerceclonewebapp.security.filters.RefreshTokFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -32,6 +33,11 @@ public class Security {
 
     @Autowired
     private RefreshTokFilter refreshTokenFilter;
+
+    @Autowired
+    private CustomAuthenticationFailureHandler failureHandler;
+
+
 
 
     @Bean
@@ -51,7 +57,7 @@ public class Security {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider)
-                .addFilter(jwtUsernamePasswordAuthFilter(authenticationManager))
+                .addFilter(customUsernamePasswordAuthFilter(authenticationManager))
                 .addFilterAfter(jwtAuthorizationFilter, CustomUsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(refreshTokenFilter, JwtAuthorizationFilter.class);
 
@@ -65,8 +71,8 @@ public class Security {
     }
 
     @Bean
-    public UsernamePasswordAuthenticationFilter jwtUsernamePasswordAuthFilter(AuthenticationManager authenticationManager){
-        CustomUsernamePasswordAuthenticationFilter authenticationFilter = new CustomUsernamePasswordAuthenticationFilter(authenticationManager,jwtService);
+    public UsernamePasswordAuthenticationFilter customUsernamePasswordAuthFilter(AuthenticationManager authenticationManager){
+        CustomUsernamePasswordAuthenticationFilter authenticationFilter = new CustomUsernamePasswordAuthenticationFilter(authenticationManager,jwtService,failureHandler);
         authenticationFilter.setFilterProcessesUrl("/auth");
         return authenticationFilter;
     }

@@ -4,8 +4,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import static com.commerce.webapp.commerceclonewebapp.util.Constants.*;
@@ -27,6 +25,7 @@ public class CookieUtil {
         c.setSecure(true);
         c.setHttpOnly(true);
         c.setMaxAge((int)TimeUnit.DAYS.toSeconds(2));
+//        c.setDomain();
         return c;
     }
     public static void deleteCookie(HttpServletResponse resp, HttpServletRequest req,String name){

@@ -11,6 +11,7 @@ import com.commerce.webapp.commerceclonewebapp.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -49,19 +50,27 @@ public class UserController {
         if(email==null || email.trim().isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid email");
         }else {
-            Customer dbCustomer = customerService.findByEmail(email);
-            if(dbCustomer!=null)
-                return ResponseEntity.ok("user already exists");
+            try {
+                Customer dbCustomer = customerService.findByEmail(email);
+                    if(dbCustomer!=null)
+                        return ResponseEntity.ok("user already exists");
+            }catch (UsernameNotFoundException e){
+                /* left empty becuase customerService.findByEmail(email)
+                    will throw UsernameNotFoundException when user not found in
+                    Db
+                * */
+
+            }
 
             Customer customer = Customer.builder()
                     .email(uiCustomer.getEmail())
                     .firstName(uiCustomer.getFirstName())
                     .lastName(uiCustomer.getLastName())
                     .password(passwordEncoder.encode(uiCustomer.getPassword()))
-                    .isAccountNonExpired(true)
-                    .isCredentialsNonExpired(true)
-                    .isEnabled(true)
-                    .isAccountNonLocked(true)
+                    .isAccountExpired(false)
+                    .isCredentialsExpired(false)
+                    .isActive(true)
+                    .isAccountLocked(false)
                     .contactNumber(uiCustomer.getContactNumber())
                     .countryCode(uiCustomer.getCountryCode())
                     .build();
@@ -83,17 +92,9 @@ public class UserController {
         if(refreshCookie != null){
             String refreshTokenStr =  refreshCookie.getValue();
             try {
-
+            ////All verification already done in RefreshToknFilter
                 String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
                 Customer user =  customerService.findByEmail(userEmail);
-
-//                RefreshToken refreshTokenDb = refreshTokService.findByToken(refreshTokenStr).orElseThrow(()->
-//                        new RuntimeException(String.format("Token %s not found in DB",refreshTokenStr)));
-//                //verify
-//                refreshTokService.verifyToken(refreshTokenDb);
-                //get user
-//                Customer user =  refreshTokenDb.getCustomer();
-                //generate jwt
                 String newJwtToken =  jwtService.generateToken(user);
                 response.addCookie(CookieUtil.generateJwtCookie(newJwtToken));
 

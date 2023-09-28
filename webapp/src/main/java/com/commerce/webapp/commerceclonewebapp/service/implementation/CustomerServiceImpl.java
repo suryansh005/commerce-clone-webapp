@@ -5,6 +5,7 @@ import com.commerce.webapp.commerceclonewebapp.repository.CustomerRepository;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,7 +16,9 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     public Customer findByEmail(String email){
-        return customerRepository.findByEmail(email);
+        return customerRepository.findByEmail(email).orElseThrow(
+                ()->new UsernameNotFoundException("User does not exit")
+        );
     }
     public Customer register(Customer customer){
         return customerRepository.save(customer);
