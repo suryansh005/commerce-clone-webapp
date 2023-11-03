@@ -38,6 +38,11 @@ public class AppConfig {
         provider.setUserDetailsService(customUserAuthenticationService);
         provider.setPasswordEncoder(passwordEncoder());
         provider.setHideUserNotFoundExceptions(false);
+        /* by default if any of username or password is incorrect UsernameNotFoundException will be thrown
+            even when user is present but password is wrong.
+            so to specifically get BadCreddentials for wrong password set this to false
+        */
+
         return provider;
     }
 

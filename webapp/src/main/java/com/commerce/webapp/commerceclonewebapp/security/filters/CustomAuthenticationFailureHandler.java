@@ -16,7 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
+//will be triggered automatically when AuthenticationException  exception or its subclass is thrown
 @Service
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
     @Autowired

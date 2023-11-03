@@ -39,7 +39,7 @@ import java.util.UUID;
 
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private  final AuthenticationManager authenticationManager;
+//    private  final AuthenticationManager authenticationManager;
 
     private  final JwtService jwtService;
 
@@ -60,7 +60,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService , CustomAuthenticationFailureHandler failureHandler) {
         super.setAuthenticationManager(authenticationManager);
         super.setAuthenticationFailureHandler(failureHandler);
-        this.authenticationManager = authenticationManager;
+//        this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
     }
 

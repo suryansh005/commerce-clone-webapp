@@ -48,7 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     private  ObjectMapper mapper ;
 
-    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token");
+    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token","/user/producer/*");
 
 
     @Override
@@ -63,15 +63,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             Cookie jwtCookie = CookieUtil.getCookieByName(request,ACCESS_TOKEN);
             String jwtToken = jwtCookie == null ? BLANK : jwtCookie.getValue();
 
-            if(jwtToken.isEmpty()){
+            try {
+
+                if(jwtToken.isEmpty()){
                 /* throw 401 in this case also  as all apis need jwt verfication
                     is some  does not add them in skip urls
                 */
 //                filterChain.doFilter(request,response);
-                throw new BadCredentialsException("Empty jwt token");
+                    throw new BadCredentialsException("Empty jwt token");
 //                return;
-            }
-            try {
+                }
                 String customerEmail = jwtService.extractEmail(jwtToken);
                 if (customerEmail != null && !customerEmail.isEmpty()) {
                     Customer customer = customerService.findByEmail(customerEmail);
@@ -84,7 +85,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     }
                 }
                 filterChain.doFilter(request,response);
-            }catch (JwtException e){
+            }catch (Exception e){
                 logger.error("Error occured During Jwt authorization " ,e );
                 ReturnStatusParam ret = null;
                 if(e instanceof ExpiredJwtException)

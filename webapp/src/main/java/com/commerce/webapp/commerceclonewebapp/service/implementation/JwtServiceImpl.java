@@ -32,16 +32,17 @@ public class JwtServiceImpl implements JwtService {
     public String extractEmail(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
+
+    public <T> T extractClaim(String jwtToken , Function<Claims,T> claimResolver){
+        return claimResolver.apply(extractAllClaims(jwtToken));
+    }
+
     public Claims extractAllClaims(String jwtToken){
         return Jwts.parser()
                 .setSigningKey(getSigninKey())
                 .parseClaimsJws(jwtToken)
                 .getBody();
     }
-    public <T> T extractClaim(String jwtToken , Function<Claims,T> claimResolver){
-        return claimResolver.apply(extractAllClaims(jwtToken));
-    }
-
     private Key getSigninKey() {
         byte [] keyByte = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyByte);
@@ -51,7 +52,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
                 .setSubject(authResult.getName())
                 .claim("authorities",authResult.getAuthorities())
-                .setIssuedAt(new Date())
+                .setIssuedAt(new Date(Instant.now().toEpochMilli()))
                 .signWith(getSigninKey(), SignatureAlgorithm.HS512)
                 .setExpiration(new Date(Instant.now().plusSeconds(86400).toEpochMilli()))
                 .compact();
