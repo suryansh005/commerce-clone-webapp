@@ -68,7 +68,7 @@ public class OTPServiceImpl implements OTPService {
                 return true;
             }
         }catch(Exception ex){
-            System.out.println("Exception occured "+ex);
+            System.out.println("Exception occurred "+ex);
         }
 
         return false;
