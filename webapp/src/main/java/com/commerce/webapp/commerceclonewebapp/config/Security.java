@@ -37,15 +37,12 @@ public class Security {
     @Autowired
     private CustomAuthenticationFailureHandler failureHandler;
 
-
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
        AuthenticationManager authenticationManager =  authenticationManager(http.getSharedObject(AuthenticationConfiguration.class));
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/register","/login")
+                .antMatchers("/user/register","/login","/verifyOTP")
                 .permitAll()
                 .anyRequest()
                     .authenticated()

@@ -5,6 +5,7 @@ import com.commerce.webapp.commerceclonewebapp.model.Customer;
 import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
+import com.commerce.webapp.commerceclonewebapp.service.interfaces.OTPService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.RefreshTokService;
 import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;
 import com.commerce.webapp.commerceclonewebapp.util.JsonUtil;
@@ -23,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.commerce.webapp.commerceclonewebapp.util.Constants.REFRESH_TOKEN;
 
-@Controller
+@RestController
 @RequestMapping(value = "/user")
 public class UserController {
 
@@ -39,12 +40,31 @@ public class UserController {
     @Autowired
     private RefreshTokService refreshTokService;
 
+    @Autowired
+    private OTPService otpService;
+
     @RequestMapping(value = "/register" , method = RequestMethod.POST , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<String> registerUser(@RequestBody String customerJson){
 
-        Customer uiCustomer = Customer.fromJsonToCustomer(customerJson);
+        ResponseEntity<String> response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Some error occurred");
 
+        try{
+            Customer uiCustomer = Customer.fromJsonToCustomer(customerJson);
+            response = register(uiCustomer);
+
+            if(response.getStatusCode() == HttpStatus.CREATED){
+                otpService.sendOTP(uiCustomer.getEmail(), 1);
+            }
+        } catch (Exception ex){
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Some error occured");
+            System.out.println("Error occured");
+        }
+        return response;
+
+    }
+
+    private ResponseEntity<String> register(Customer uiCustomer){
         String email = uiCustomer.getEmail();
 
         if(email==null || email.trim().isEmpty()){
@@ -52,8 +72,8 @@ public class UserController {
         }else {
             try {
                 Customer dbCustomer = customerService.findByEmail(email);
-                    if(dbCustomer!=null)
-                        return ResponseEntity.ok("user already exists");
+                if(dbCustomer!=null)
+                    return ResponseEntity.ok("user already exists");
             }catch (UsernameNotFoundException e){
                 /* left empty becuase customerService.findByEmail(email)
                     will throw UsernameNotFoundException when user not found in
@@ -64,8 +84,7 @@ public class UserController {
 
             Customer customer = Customer.builder()
                     .email(uiCustomer.getEmail())
-                    .firstName(uiCustomer.getFirstName())
-                    .lastName(uiCustomer.getLastName())
+                    .name(uiCustomer.getName())
                     .password(passwordEncoder.encode(uiCustomer.getPassword()))
                     .isAccountExpired(false)
                     .isCredentialsExpired(false)
@@ -78,6 +97,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body("user created");
         }
     }
+
     @RequestMapping(value = "/test")
     @ResponseBody
     public ResponseEntity<?> test(){

@@ -53,18 +53,17 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
     @Autowired
     private CustomerRepository customerRepository;
 
-
-
-
     @Autowired
-    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService , CustomAuthenticationFailureHandler failureHandler) {
+    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager,
+                                                      JwtService jwtService,
+                                                      CustomAuthenticationFailureHandler failureHandler) {
+
         super.setAuthenticationManager(authenticationManager);
         super.setAuthenticationFailureHandler(failureHandler);
 //        this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+
     }
-
-
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
@@ -72,18 +71,17 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
         Authentication authentication = null;
 
 //               JwtAuthRequest jwtAuthRequest = new ObjectMapper().convertValue(request.getParameterMap(),JwtAuthRequest.class);
-               JwtAuthRequest jwtAuthRequest = JwtAuthRequest.builder().
-                                                username(request.getParameter("username"))
-                                                .password(request.getParameter("password")).build();
+        JwtAuthRequest jwtAuthRequest = JwtAuthRequest.builder().
+                                        username(request.getParameter("username"))
+                                        .password(request.getParameter("password")).build();
 
-               UsernamePasswordAuthenticationToken authObject =  new UsernamePasswordAuthenticationToken(
-                       jwtAuthRequest.getUsername(),
-                       jwtAuthRequest.getPassword()
-               );
-                authentication = super.attemptAuthentication(request,response);
+        UsernamePasswordAuthenticationToken authObject =  new UsernamePasswordAuthenticationToken(
+               jwtAuthRequest.getUsername(),
+               jwtAuthRequest.getPassword()
+        );
+        authentication = super.attemptAuthentication(request,response);
 
-               return authentication;
-
+        return authentication;
 
     }
 
@@ -122,8 +120,9 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
                                             HttpServletResponse response, FilterChain chain,
                                             Authentication authResult)
             throws IOException, ServletException {
-        ReturnStatusParam.ReturnStatusParamBuilder builder =  ReturnStatusParam.builder().statusCode(HttpStatus.OK.value()).success(true);
 
+        ReturnStatusParam.ReturnStatusParamBuilder builder =
+                ReturnStatusParam.builder().statusCode(HttpStatus.OK.value()).success(true);
 
             String jwtToken =  jwtService.generateToken(authResult);
 
@@ -138,9 +137,6 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
         response.setContentType("application/json; charset=utf-8");
         mapper.writeValue(response.getWriter(), builder.build());
+
     }
-
-
-
-
 }

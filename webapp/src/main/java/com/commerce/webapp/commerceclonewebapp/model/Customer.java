@@ -5,7 +5,6 @@ import flexjson.JSONDeserializer;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 
@@ -16,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @Table(name = "customer" , uniqueConstraints = {
 		@UniqueConstraint(columnNames = "email")
 })
@@ -26,11 +27,8 @@ public class Customer  {
 	@Column(name = "customer_id")
 	private Long customerId;
 
-	@Column(name = "first_name")
-	private String firstName;
-
-	@Column(name = "last_name")
-	private String lastName;
+	@Column(name = "name")
+	private String name;
 
 //	@Email(regexp = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$")
 	private String email;
@@ -45,13 +43,15 @@ public class Customer  {
 
 	@Column(name = "is_Account_Expired")
 	private boolean isAccountExpired;
+
 	@Column(name = "is_Account_Locked")
 	private boolean isAccountLocked;
+
 	@Column(name = "is_Credentials_Expired")
 	private boolean isCredentialsExpired;
+
 	@Column(name = "is_Active")
 	private boolean isActive;
-
 
 	public Long getCustomerId() {
 		return customerId;
@@ -59,22 +59,6 @@ public class Customer  {
 
 	public void setCustomerId(Long customerId) {
 		this.customerId = customerId;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 
 	public String getEmail() {
@@ -85,7 +69,6 @@ public class Customer  {
 		this.email = email;
 	}
 
-
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority>authorityList = List.of( new SimpleGrantedAuthority("ROLE_User"));
 		return authorityList;
@@ -94,7 +77,6 @@ public class Customer  {
 	public String getPassword() {
 		return password;
 	}
-
 
 	public String getUsername() {
 		return email;
@@ -156,5 +138,4 @@ public class Customer  {
 	public static Customer fromJsonToCustomer(String json){
 		return new JSONDeserializer<Customer>().deserialize(json,Customer.class);
 	}
-
 }

@@ -48,7 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     private  ObjectMapper mapper ;
 
-    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token","/user/producer/*");
+    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token","/user/producer/*", "/verifyOTP");
 
 
     @Override

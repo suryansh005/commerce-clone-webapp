@@ -31,9 +31,18 @@ public class RefreshTokServiceImpl implements RefreshTokService {
     public Optional<RefreshToken> findByToken(String token){
         return refreshTokenRepository.findByToken(token);
     }
+
     public RefreshToken createRefreshToken(Authentication authResult){
+
+        return createRefreshToken(authResult.getName());
+
+    }
+
+    public RefreshToken createRefreshToken(String email){
+
         RefreshToken refreshToken = new RefreshToken();
-        Customer tokenUser =  customerService.findByEmail(authResult.getName());
+
+        Customer tokenUser =  customerService.findByEmail(email);
 
         refreshToken.setCustomer(tokenUser);
         refreshToken.setExpiryDate(new Date(Instant.now().plus(30 , ChronoUnit.DAYS ).toEpochMilli()));
@@ -43,6 +52,7 @@ public class RefreshTokServiceImpl implements RefreshTokService {
 
         return refreshTokenDb;
     }
+
     public RefreshToken verifyToken(RefreshToken token) {
         if (token.getExpiryDate().toInstant().isBefore(Instant.now())){
             refreshTokenRepository.delete(token);
@@ -50,6 +60,7 @@ public class RefreshTokServiceImpl implements RefreshTokService {
         }
         return token;
     }
+
     public Long deleteByUserId(Long userId){
        return refreshTokenRepository.deleteByUser(
                customerRepository.findById(userId).get()

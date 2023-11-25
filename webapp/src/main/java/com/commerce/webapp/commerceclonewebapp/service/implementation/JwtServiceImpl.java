@@ -25,9 +25,9 @@ import static com.commerce.webapp.commerceclonewebapp.util.Constants.AUTHORITIES
 @Service
 public class JwtServiceImpl implements JwtService {
 
-
     @Value("${jwt.secret.key}")
     private  String SECRET_KEY;
+
     @Override
     public String extractEmail(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
@@ -43,10 +43,12 @@ public class JwtServiceImpl implements JwtService {
                 .parseClaimsJws(jwtToken)
                 .getBody();
     }
+
     private Key getSigninKey() {
         byte [] keyByte = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyByte);
     }
+
     public String generateToken(Authentication authResult){
 
         return Jwts.builder()
@@ -57,9 +59,8 @@ public class JwtServiceImpl implements JwtService {
                 .setExpiration(new Date(Instant.now().plusSeconds(86400).toEpochMilli()))
                 .compact();
 
-
-
     }
+
     public String generateToken(Customer customer){
 
         return Jwts.builder()
@@ -71,6 +72,7 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
 
     }
+
     public boolean isTokenValid(Customer customer, String jwtToken){
         return (isTokenNonExpired(jwtToken));
     }
@@ -78,7 +80,4 @@ public class JwtServiceImpl implements JwtService {
     private boolean isTokenNonExpired(String jwtToken) {
         return extractClaim(jwtToken,Claims::getExpiration).after(new Date(Instant.now().toEpochMilli()));
     }
-
-
-
 }
