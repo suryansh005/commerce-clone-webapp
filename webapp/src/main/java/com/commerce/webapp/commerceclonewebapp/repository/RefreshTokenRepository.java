@@ -1,7 +1,7 @@
 package com.commerce.webapp.commerceclonewebapp.repository;
 
-import com.commerce.webapp.commerceclonewebapp.model.Customer;
-import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
+import com.commerce.webapp.commerceclonewebapp.model.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

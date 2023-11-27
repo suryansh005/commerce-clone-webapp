@@ -1,40 +1,28 @@
 package com.commerce.webapp.commerceclonewebapp.security.filters;
 
 import com.commerce.webapp.commerceclonewebapp.model.DummyAuthentication;
-import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
+import com.commerce.webapp.commerceclonewebapp.model.entity.RefreshToken;
 import com.commerce.webapp.commerceclonewebapp.model.params.ReturnStatusParam;
 import com.commerce.webapp.commerceclonewebapp.repository.CustomerRepository;
-import com.commerce.webapp.commerceclonewebapp.repository.RefreshTokenRepository;
 import com.commerce.webapp.commerceclonewebapp.security.JwtAuthRequest;
-import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.RefreshTokService;
 import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.Date;
-import java.util.UUID;
 
 
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

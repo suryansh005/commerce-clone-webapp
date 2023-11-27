@@ -1,7 +1,7 @@
 package com.commerce.webapp.commerceclonewebapp.service.implementation;
 
-import com.commerce.webapp.commerceclonewebapp.model.Customer;
-import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
+import com.commerce.webapp.commerceclonewebapp.model.entity.RefreshToken;
 import com.commerce.webapp.commerceclonewebapp.repository.CustomerRepository;
 import com.commerce.webapp.commerceclonewebapp.repository.RefreshTokenRepository;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;

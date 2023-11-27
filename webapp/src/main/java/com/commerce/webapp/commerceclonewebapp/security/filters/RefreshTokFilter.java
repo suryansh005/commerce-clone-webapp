@@ -1,7 +1,7 @@
 package com.commerce.webapp.commerceclonewebapp.security.filters;
 
-import com.commerce.webapp.commerceclonewebapp.model.Customer;
-import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
+import com.commerce.webapp.commerceclonewebapp.model.entity.RefreshToken;
 import com.commerce.webapp.commerceclonewebapp.model.params.ReturnStatusParam;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.RefreshTokService;
 import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;

@@ -1,9 +1,7 @@
 package com.commerce.webapp.commerceclonewebapp.service.interfaces;
 
-import com.commerce.webapp.commerceclonewebapp.model.Customer;
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
 import org.springframework.security.core.Authentication;
-
-import javax.servlet.http.Cookie;
 
 public interface JwtService {
     public String extractEmail(String jwtToken);

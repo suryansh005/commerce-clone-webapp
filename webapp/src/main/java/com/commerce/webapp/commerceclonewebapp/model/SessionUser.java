@@ -1,5 +1,6 @@
 package com.commerce.webapp.commerceclonewebapp.model;
 
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 

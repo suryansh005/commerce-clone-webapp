@@ -1,6 +1,6 @@
 package com.commerce.webapp.commerceclonewebapp.service.interfaces;
 
-import com.commerce.webapp.commerceclonewebapp.model.RefreshToken;
+import com.commerce.webapp.commerceclonewebapp.model.entity.RefreshToken;
 import org.springframework.security.core.Authentication;
 
 import java.util.Optional;

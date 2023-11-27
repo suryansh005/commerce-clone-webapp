@@ -1,6 +1,6 @@
 package com.commerce.webapp.commerceclonewebapp.security.filters;
 
-import com.commerce.webapp.commerceclonewebapp.model.Customer;
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
 import com.commerce.webapp.commerceclonewebapp.model.params.ReturnStatusParam;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.JwtService;
@@ -9,7 +9,6 @@ import com.commerce.webapp.commerceclonewebapp.util.CookieUtil;
 import com.commerce.webapp.commerceclonewebapp.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -48,7 +47,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Autowired
     private  ObjectMapper mapper ;
 
-    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token","/user/producer/*");
+    private static List<String> skipFilterUrls = Arrays.asList("/login","/user/register","/user/refresh-token","/user/test");
 
 
     @Override

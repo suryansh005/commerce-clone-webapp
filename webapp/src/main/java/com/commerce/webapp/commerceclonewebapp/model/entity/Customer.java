@@ -1,11 +1,10 @@
-package com.commerce.webapp.commerceclonewebapp.model;
+package com.commerce.webapp.commerceclonewebapp.model.entity;
 
 import flexjson.JSON;
 import flexjson.JSONDeserializer;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 

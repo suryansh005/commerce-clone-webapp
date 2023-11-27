@@ -1,6 +1,6 @@
 package com.commerce.webapp.commerceclonewebapp.service.implementation;
 
-import com.commerce.webapp.commerceclonewebapp.model.Customer;
+import com.commerce.webapp.commerceclonewebapp.model.entity.Customer;
 import com.commerce.webapp.commerceclonewebapp.model.SessionUser;
 import com.commerce.webapp.commerceclonewebapp.service.interfaces.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;

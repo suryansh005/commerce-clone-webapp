@@ -1,4 +1,4 @@
-package com.commerce.webapp.commerceclonewebapp.model;
+package com.commerce.webapp.commerceclonewebapp.model.entity;
 
 
 import javax.persistence.*;
